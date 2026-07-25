@@ -1,0 +1,28 @@
+#!/bin/sh
+# fabric — Tier-A comms fabric client (Postgres). CF-M2. Replaces msg-* delivery + the comms log.
+set -u
+. "${FABRIC_CONF:-$HOME/.config/fabric/env}"
+run() { psql "$FABRIC_PGURL" -qtAX "$@"; }   # SQL arrives on stdin so :'var' interpolates
+newid() { d=date; command -v gdate >/dev/null 2>&1 && d=gdate; [ -x /opt/homebrew/bin/gdate ] && d=/opt/homebrew/bin/gdate; printf '%s-%s' "$("$d" -u +%Y%m%dT%H%M%S%6N)" "$(od -An -N5 -tx1 /dev/urandom | tr -d ' \n')"; }
+cmd="${1:-help}"; [ $# -gt 0 ] && shift
+case "$cmd" in
+  send) to="$1"; shift; text="$*"; id="$(newid)"
+    printf '%s' "INSERT INTO messages(id,to_sphere,from_ref,kind,body) VALUES (:'vid',:'vto',:'vfrom','msg',jsonb_build_object('text',:'vtext'));" \
+      | run -v vid="$id" -v vto="$to" -v vfrom="$FABRIC_SPHERE" -v vtext="$text" && echo "sent $id -> $to" ;;
+  drain)
+    # Surface WHEN it is and HOW STALE each message is. A Claude has no innate sense of elapsed
+    # time and will otherwise carry a stale frame across an arbitrary gap (observed: 10h).
+    # HEADER ONLY WHEN THERE IS MAIL: an unconditional header makes `drain` never return empty,
+    # and the Stop/SessionStart hooks decide "is there mail?" by counting non-empty lines - so
+    # they fired a phantom message every turn. Emit nothing at all when the queue is empty.
+    _out=$(printf '%s' "UPDATE messages SET status='claimed',claimed_by=:'vc',claimed_at=now() WHERE id IN (SELECT id FROM messages WHERE to_sphere=:'vs' AND status='new' AND (to_claude IS NULL OR to_claude=:'vc') ORDER BY priority DESC,id FOR UPDATE SKIP LOCKED) RETURNING id,from_ref,'waited='||date_trunc('second',now()-created_at)::text,body->>'text';" \
+      | run -v vs="$FABRIC_SPHERE" -v vc="$FABRIC_CLAUDE")
+    if [ -n "$_out" ]; then
+      echo "[now $(date '+%Y-%m-%d %H:%M:%S %Z')]"
+      printf '%s\n' "$_out"
+    fi ;;
+  ack) printf '%s' "UPDATE messages SET status='done' WHERE id=:'vid' AND claimed_by=:'vc';" | run -v vid="$1" -v vc="$FABRIC_CLAUDE" ;;
+  heartbeat) printf '%s' "INSERT INTO claudes(claude_id,host,last_seen) VALUES(:'vc',:'vh',now()) ON CONFLICT (claude_id) DO UPDATE SET last_seen=now(),host=EXCLUDED.host;" | run -v vc="$FABRIC_CLAUDE" -v vh="$(hostname -s)" ;;
+  peek) printf '%s' "SELECT id,from_ref,status,body->>'text' AS text FROM messages WHERE to_sphere=:'vs' ORDER BY id DESC LIMIT 20;" | run -v vs="$FABRIC_SPHERE" ;;
+  *) echo "usage: fabric {send <sphere> <text> | drain | ack <id> | heartbeat | peek}"; exit 1 ;;
+esac

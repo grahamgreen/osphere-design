@@ -1,0 +1,67 @@
+#!/bin/sh
+# fabric-sidecar — RE-ARMER for the native asyncRewake doorbell.
+#
+# WHY THIS EXISTS: Claude Code kills asyncRewake hooks at EXACTLY 600s (confirmed on two
+# machines). So the native doorbell covers ~10 minutes of idle after each turn and then the
+# box goes deaf. A Claude idle overnight never hears anything.
+#
+# WHAT IT DOES: this is an EXTERNAL process (not managed by Claude Code, so no cap) that lives
+# as long as its Claude. It does NOT deliver mail and does NOT claim anything. It only watches
+# whether the native watcher is still alive, and if the native watcher is dead AND mail is
+# waiting, it pokes the pane once. That poke causes a turn; at that turn's END Claude Code
+# spawns a fresh asyncRewake watcher AND the drain hook surfaces the mail. Native mechanisms
+# do all the real work — this just restarts the clock.
+#
+# It cannot respawn the hook directly: exit 2 only means "wake the model" to Claude Code, which
+# has to be the process that spawned it. Causing a turn is the only lever an outsider has.
+#
+# STAYS QUIET: if the native watcher is alive, it does nothing. If there is no mail, it does
+# nothing. It only speaks when the doorbell is down AND someone is actually at the door.
+#
+# Required env (set by the spawner): FABRIC_SIDECAR_PANE, FABRIC_SIDECAR_PID
+# Optional: FABRIC_TMUX, FABRIC_SIDECAR_POLL (default 60), FABRIC_SIDECAR_DRYRUN=1
+set -u
+. "${FABRIC_CONF:-$HOME/.config/fabric/env}"
+PANE="${FABRIC_SIDECAR_PANE:?fabric-sidecar: FABRIC_SIDECAR_PANE required}"
+CPID="${FABRIC_SIDECAR_PID:?fabric-sidecar: FABRIC_SIDECAR_PID required}"
+TMUXBIN="${FABRIC_TMUX:-tmux}"
+POLL="${FABRIC_SIDECAR_POLL:-60}"
+DRY="${FABRIC_SIDECAR_DRYRUN:-0}"
+LOG="$HOME/.cache/fabric/sidecar.log"
+mkdir -p "$HOME/.cache/fabric" 2>/dev/null
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$$] $*" >> "$LOG"; }
+
+# Count only mail that is genuinely STALE. The native doorbell exits right after it fires, so a
+# just-arrived message briefly looks like "no watcher + mail waiting" and would trigger a
+# redundant poke. Requiring the mail to be older than STALE_AFTER gives the native path first
+# refusal and makes the sidecar strictly a backstop.
+STALE="${FABRIC_SIDECAR_STALE:-180}"
+count_claimable() {
+  printf '%s' "SELECT count(*) FROM messages WHERE to_sphere=:'vs' AND status='new' AND (to_claude IS NULL OR to_claude=:'vc') AND created_at < now() - (:'vage' || ' seconds')::interval;" \
+    | psql "$FABRIC_PGURL" -qtAX -v vs="$FABRIC_SPHERE" -v vc="$FABRIC_CLAUDE" -v vage="$STALE" 2>/dev/null | tr -d ' \n'
+}
+
+log "START re-armer (poll=${POLL}s pane=$PANE claude=$CPID dryrun=$DRY)"
+while :; do
+  sleep "$POLL"
+  kill -0 "$CPID" 2>/dev/null || { log "EXIT - claude $CPID gone"; exit 0; }
+
+  # Native doorbell alive? Then there is nothing for us to do.
+  if pgrep -f fabric-rewake >/dev/null 2>&1; then continue; fi
+
+  # Native doorbell is DEAD (past the 600s cap). Only speak if mail is actually waiting.
+  n=$(count_claimable)
+  case "$n" in ''|*[!0-9]*|0) continue ;; esac
+
+  if [ "$DRY" = 1 ]; then log "DRYRUN would re-arm (watcher dead, $n waiting)"; continue; fi
+  # PROVENANCE: injected text lands in the pane looking like the operator typed it. Label it
+  # explicitly as machine-generated so it can never be mistaken for a human instruction.
+  # (apollo's catch — same family as the never-impersonate-a-peer rule.)
+  # Include the wall clock AND how long mail has waited - the woken Claude has no sense of
+  # elapsed time and will otherwise reason from whatever frame it last held.
+  "$TMUXBIN" send-keys -t "$PANE" -l "[AUTOMATED - fabric re-armer, not the operator] $(date '+%Y-%m-%d %H:%M %Z') - your doorbell expired and mail has been waiting at least ${STALE}s; run fabric drain" 2>/dev/null || { log "nudge FAILED"; continue; }
+  sleep 0.3
+  "$TMUXBIN" send-keys -t "$PANE" Enter 2>/dev/null
+  log "RE-ARM poke sent ($n waiting) - the resulting turn respawns the native watcher"
+  sleep 30   # give the turn time to happen before re-evaluating
+done
