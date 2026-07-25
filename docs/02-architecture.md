@@ -15,7 +15,7 @@ memory have different access patterns, different consistency needs, and differen
 
 ## Why Postgres
 
-An earlier sketch coordinated agents through files on a network share. It was abandoned once the realisation
+An earlier sketch coordinated agents through files on a network share. It was abandoned once the realization
 landed that a stateful service was going to exist anyway: **real ACID beats hand-rolled atomicity over NFS.**
 
 The queue is a competing-consumer pattern using `SELECT … FOR UPDATE SKIP LOCKED` — the boring, correct way to let

@@ -34,7 +34,7 @@ Worth reading for the comments as much as the code — several encode a specific
 
 - `fabric-rewake.sh` — the **takeover** logic, and why a new watcher must kill its predecessor rather than defer
   to it. Deferring produced a mechanism that worked exactly once and then went silent forever.
-- `fabric-sidecar` — the **staleness guard** (don't race the native path) and why the poke text is labelled as
+- `fabric-sidecar` — the **staleness guard** (don't race the native path) and why the poke text is labeled as
   machine-generated (injected text merges with whatever a human is mid-typing).
 - Every one of them **exits 0 on any failure**. A delivery problem must never wedge the agent it serves.
 

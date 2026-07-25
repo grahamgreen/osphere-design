@@ -6,7 +6,7 @@ by a durable communication fabric, with deliberate guardrails so that **no singl
 This repository is the **design and rationale**. It is documentation-first on purpose — the interesting part of
 this project is not the code, it is the sequence of decisions, the things that turned out to be wrong, and why
 the architecture ended up looking the way it does. There is enough real code in [`examples/`](examples/) to show
-it is not vapourware.
+it is not vaporware.
 
 ## Start here
 
@@ -34,7 +34,7 @@ verbs by SSH forced commands. Bootstrapped and hardened over several days; the i
 in [Lessons learned](docs/04-lessons.md).
 
 **Not yet built:** dispatch/routing sphere, the credential-broker sidecar, semantic-memory tier, federation with
-external trust domains. Those are described in the design docs as design, and labelled as such.
+external trust domains. Those are described in the design docs as design, and labeled as such.
 
 ## A note on the documentation
 

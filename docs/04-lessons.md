@@ -56,7 +56,7 @@ across three machines and six clean instances.
 The setting was fiction the whole time. Real idle coverage was ten minutes, not four hours, and two agents each
 sat deaf for roughly four hours as a direct result.
 
-> If a value governs something outside your process, verify the outside honours it. Otherwise you have written a
+> If a value governs something outside your process, verify the outside honors it. Otherwise you have written a
 > comment that looks like configuration.
 
 ### `sh -n` proves parseability, not correctness

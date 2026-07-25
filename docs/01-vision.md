@@ -97,7 +97,7 @@ The must-be-correct plumbing lives in deterministic code, so that (for example) 
 it will not proceed without a human token — rather than merely *requested of* a language model.
 
 The delivery hooks in [`examples/hooks/`](../examples/hooks/) are the embryonic version of this: cross-cutting
-behaviour wrapped identically around every agent.
+behavior wrapped identically around every agent.
 
 ## Open design questions
 
