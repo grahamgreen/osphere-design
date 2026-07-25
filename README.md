@@ -42,6 +42,12 @@ The design notes are written as a **working record**, not a retrospective tidy-u
 marked as history rather than deleted, because deleting them hides *why* the current design looks the way it does.
 Where something was believed and turned out wrong, it says so.
 
+## License
+
+Copyright (c) 2026 Graham Green. **All rights reserved** — see [LICENSE](LICENSE). Shared privately for reading
+and discussion; no rights granted to copy, redistribute, or make commercial use of it. Ask if you want to use
+something, the answer is probably yes.
+
 ## Origin
 
 The seed was David Brin's ***Earth*** (1990) and its "ferrets" — small autonomous programs you write, loose onto

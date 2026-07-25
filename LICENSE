@@ -1,0 +1,16 @@
+Copyright (c) 2026 Graham Green. All rights reserved.
+
+This repository — including its documentation, design notes, and example code — is
+shared privately for reading and discussion only.
+
+No license, express or implied, is granted to copy, modify, distribute, publish,
+sublicense, or make commercial use of any part of this work. Access to this
+repository does not confer any right to use its contents.
+
+If you would like to use any part of this work, please ask. The answer is likely
+to be yes for anything reasonable; the point of this notice is to make the default
+explicit rather than ambiguous.
+
+Note on scope: copyright protects the expression here — the text and the code — not
+the underlying ideas. Nothing in this notice is intended to discourage anyone from
+thinking about these problems or building their own system.
