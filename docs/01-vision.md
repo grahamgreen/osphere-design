@@ -21,7 +21,7 @@ peers with bounded jobs, not infrastructure sitting *above* the workers.
 This is the load-bearing distinction, and it took a while to see.
 
 A **sphere is a role** — a domain plus the authority it owns. An **agent is a worker** — a running session. They
-are different kinds of thing, related **many-to-many via an attachment**.
+are different kinds of things, related **many-to-many via an attachment**.
 
 - A sphere is served by **0..N** agents. **Zero is legal** — a dormant sphere still owns its backlog, its memory,
   and its address.

@@ -23,7 +23,7 @@ Most multi-agent systems are one process spawning ephemeral helpers that vanish 
 other thing: **durable, addressable, independent agents** with their own identity, their own authority, their own
 memory, and the standing ability to refuse. A "sphere" is a *role* — a domain plus the authority it owns. An agent
 is a *worker* that attaches to a sphere and borrows that authority while attached. They are different kinds of
-thing, related many-to-many, and neither is pinned to a host. If that sounds like Kubernetes — sphere ≈ Service,
+things, related many-to-many, and neither is pinned to a host. If that sounds like Kubernetes — sphere ≈ Service,
 agent ≈ Pod — that is deliberate, and the metaphor has paid for itself repeatedly.
 
 ## Current state
