@@ -83,6 +83,27 @@ each agent still runs as the operator's own user account and can read those cred
 paths between machines had not contained anything on a machine. That correction is now the top item in the
 security backlog.
 
+## The later pivots (added after the rewrite)
+
+The arc continued past this document's first draft; the full story is in
+[The rewrite](05-the-rewrite.md). In the same register as above:
+
+- **Prose-relayed design → a ruled decision ledger.** Three implementations of one
+  system diverged because nothing written settled the forks. The fix was structural:
+  the operator rules, the ruling goes in a file, implementations answer to the file.
+- **Shell scaffolding → one binary.** First the hooks, then the liveness sidecar,
+  finally everything: no shell in the fabric stack. Bought the property the whole
+  project now leans on — *the version string is the behavior contract*.
+- **Hosted-model dependence → a fallback tier.** A provider outage revealed the real
+  single point of failure was nobody's host. Local models now hold seats during
+  outages, under a checklist authored in advance and a triage gate the model can veto
+  but never approve.
+- **Agents-only membership → peers and limbs.** Not everything that speaks on the
+  fabric bears judgment. A *limb* (a firewall's telemetry binary, a liveness sidecar)
+  has tools and signals but no mailbox — because acknowledgment means responsibility,
+  and responsibility requires judgment. The boundary fell out of the ack semantics
+  rather than being drawn by hand.
+
 ## Why keep all of this
 
 Deleting superseded thinking makes a design look inevitable. It wasn't. Two of the ideas that survived every

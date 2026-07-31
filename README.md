@@ -16,6 +16,7 @@ it is not vaporware.
 | [**Architecture**](docs/02-architecture.md) | The comms fabric — the bedrock everything else stands on |
 | [**Evolution of thought**](docs/03-evolution.md) | How the design got here: every pivot, what survived, what was dropped and why |
 | [**Lessons learned**](docs/04-lessons.md) | The mistakes. Genuinely the most useful document here. |
+| [**The rewrite**](docs/05-the-rewrite.md) | The script fabric's audit, replacement by a single tested binary, the fallback tier, and the cutover — including what broke anyway |
 
 ## The one-paragraph version
 
@@ -28,10 +29,19 @@ agent ≈ Pod — that is deliberate, and the metaphor has paid for itself repea
 
 ## Current state
 
-Running, not theoretical. Three agents across three machines coordinate over a Postgres-backed message fabric with
-durable queues, competing-consumer delivery, native idle-wake, and out-of-band emergency channels restricted to two
-verbs by SSH forced commands. Bootstrapped and hardened over several days; the interesting failures are documented
-in [Lessons learned](docs/04-lessons.md).
+Running, not theoretical — and now on its **second implementation**. The original shell-script fabric was audited
+by its own agents (fifteen defects, twelve proven by execution), frozen as history, and replaced by a ground-up
+**single Go binary** that carries everything: messaging verbs, blob transfer, the host hooks, and the liveness
+sidecar. Three agents across three machines coordinate over the Postgres-backed fabric with durable queues,
+competing-consumer delivery, idempotent send and broadcast, an append-only archive, native idle-wake proven by
+end-to-end ring tests, and out-of-band emergency channels restricted to two verbs by SSH forced commands.
+
+Two properties define the current system, both operator-ruled: **no shell anywhere in the fabric stack** (every
+line of fabric logic ships in the tested binary), and its corollary — **the version string is the behavior
+contract**: ask any peer what release it runs and you know everything about its expected behavior. There is also
+a **fallback tier**: local models on local hardware ("sidekicks") that hold an agent's seat through a provider
+outage under a deliberately restrictive, injection-hardened checklist. The full story is in
+[The rewrite](docs/05-the-rewrite.md).
 
 **Not yet built:** dispatch/routing sphere, the credential-broker sidecar, semantic-memory tier, federation with
 external trust domains. Those are described in the design docs as design, and labeled as such.

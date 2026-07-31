@@ -242,6 +242,44 @@ the coordinating agent simply reaching around it is not a guardrail.
 
 ---
 
+## Lessons from the rewrite and cutover (the second batch)
+
+The migration to the single-binary fabric ([The rewrite](05-the-rewrite.md)) produced
+its own crop, in the same spirit:
+
+### List what a layer secretly does before deleting it
+Banning the shell layer was correct — and the shell re-armer being retired turned out to
+*also* be the heartbeat, one silenced line nobody was reading. Fleet liveness died
+within the hour of the cleanup that improved everything else. Rulings that remove a
+component need an inventory of that component's accidental duties first.
+
+### Verify the waker, not just the reader — and prove it with a ring
+Transport was verified end-to-end at cutover; the wake layer rode along unverified and
+was broken fleet-wide. The standard that fixed it: plant a message, go genuinely idle,
+and be *woken* to drain it. A pass through the wrong mechanism was correctly refused
+with the distinction that now guards every green result: **wrong about why is cheap;
+wrong about whether costs someone an outage.**
+
+### Untrusted text must never vote on its own classification
+A triage prompt let a message describing itself as "informational" earn its own
+acknowledgment. The structural fix: deterministic code decides candidacy from envelope
+facts; the model can only veto. And because agents quote each other constantly:
+**authority must never be a property of text that can be copied.**
+
+### Calibrate on the tier that breaks, not the tier you can see
+A generation cap tuned on the fast box exceeded the slow box's timeout on ordinary
+traffic — and the slow tier is definitionally the fallback, the one least observable
+and most needed. Constants set from the author's own machine are folklore wearing a
+number.
+
+### Presence is not capacity; never-seen is not went-quiet
+A seat can be held, a model up, a heartbeat fresh — and the peer still unable to
+process what arrives. And a registry row for something that never lived must not read
+like something that died. Both distinctions now live in the schema and the monitoring
+vocabulary, because both were learned by misreading a table at midnight.
+
+---
+
 ## The shortest version
 
 - Test the second iteration. Silence is not success.
@@ -253,4 +291,7 @@ the coordinating agent simply reaching around it is not a guardrail.
 - Ask what hardening does to the human.
 - Do not let a big security effort feel like more than it was.
 - Give the reviewer real independence, including the right to refuse.
+- List what a layer secretly does before deleting it.
+- Ring the doorbell; do not infer it.
+- Nothing copyable confers authority.
 - And check what time it is.
