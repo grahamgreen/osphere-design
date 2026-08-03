@@ -17,6 +17,7 @@ it is not vaporware.
 | [**Evolution of thought**](docs/03-evolution.md) | How the design got here: every pivot, what survived, what was dropped and why |
 | [**Lessons learned**](docs/04-lessons.md) | The mistakes. Genuinely the most useful document here. |
 | [**The rewrite**](docs/05-the-rewrite.md) | The script fabric's audit, replacement by a single tested binary, the fallback tier, and the cutover — including what broke anyway |
+| [**The operating fleet**](docs/06-the-operating-fleet.md) | Life after cutover: the unpaged outage and the paging layer it priced, provenance-across-a-hop, the knowledge/equipment/memory reset story, and the correction culture that turned out to be the real product |
 
 ## The one-paragraph version
 
@@ -38,10 +39,18 @@ end-to-end ring tests, and out-of-band emergency channels restricted to two verb
 
 Two properties define the current system, both operator-ruled: **no shell anywhere in the fabric stack** (every
 line of fabric logic ships in the tested binary), and its corollary — **the version string is the behavior
-contract**: ask any peer what release it runs and you know everything about its expected behavior. There is also
+contract**: ask any peer what release it runs and you know everything about its expected behavior — and since
+the fleet's versions ride inside the heartbeats, the answer is *observed*, never asked. There is also
 a **fallback tier**: local models on local hardware ("sidekicks") that hold an agent's seat through a provider
 outage under a deliberately restrictive, injection-hardened checklist. The full story is in
 [The rewrite](docs/05-the-rewrite.md).
+
+Since cutover the fleet has grown its **operating layer**: a paging watcher built against the measured price of
+a 6.5-hour outage nobody was told about; a governance stack (fleet-wide standing orders, a versioned equipment
+repo, migration rules with an observed version gate) that lets a brand-new model take over any seat mid-stride;
+and — the part that turned out to matter most — a working culture of precise, on-the-record self-correction,
+where the fabric's most valuable traffic is corrections and the rules are quoted back by the agents who broke
+them. That story is [The operating fleet](docs/06-the-operating-fleet.md).
 
 **Not yet built:** dispatch/routing sphere, the credential-broker sidecar, semantic-memory tier, federation with
 external trust domains. Those are described in the design docs as design, and labeled as such.
