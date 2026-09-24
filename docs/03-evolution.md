@@ -10,7 +10,7 @@ history rather than deleted, because **deleting it hides why the current design 
 | **0. The seed** | *decades earlier* | David Brin's ***Earth*** (1990) and its **"ferrets"** — small autonomous programs you write, loose onto the net to hunt down information, and have **report back**. Lodged as a "someday." This project is a direct result of that read. | — |
 | **1. OAuth appliance** | day 1 | One shared memory store — "one store, three seats" — behind OAuth and public TLS. | A cloud VM |
 | **2. Tailnet pivot** | day 2 | Drop OAuth, the reverse proxy, and public TLS. Reach it **privately over a mesh VPN** with static tokens, plus a phone web app as the front door. | An always-on desktop |
-| **3. The claudeosphere** | day 6 | Not a store — a **mesh of specialized spheres** sharing a brain, coordinated by comms, with front doors, dispatch, and guardrails. | A small k3s cluster |
+| **3. The osphere** | day 6 | Not a store — a **mesh of specialized spheres** sharing a brain, coordinated by comms, with front doors, dispatch, and guardrails. | A small k3s cluster |
 | **4. Bedrock + cardinality** | day 7 | The **comms fabric is the bedrock**. **Sphere ≠ agent** — many-to-many, host-decoupled. | " |
 | **5. Store split** | day 8 | **Two stores**: Tier-A coordination is not Tier-B semantic memory. Postgres for both. | " |
 | **6. It runs** | day 11–12 | Fabric built and cut over. Three agents, durable queues, native idle-wake, tmux injection retired from the normal path. | " |

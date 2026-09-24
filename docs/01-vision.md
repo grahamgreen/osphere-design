@@ -1,8 +1,8 @@
-# Vision — the claudeosphere
+# Vision — the osphere
 
 > A fleet of **specialized spheres of control**, hosted across home infrastructure — *not* pinned to any one box —
 > sharing one brain, coordinated by communication, with conversational **front doors** that dispatch work *into*
-> the fleet. You chat with an agent on your phone; it passes work out into the claudeosphere.
+> the fleet. You chat with an agent on your phone; it passes work out into the osphere.
 
 ## Everything is a sphere
 
@@ -35,7 +35,7 @@ are different kinds of things, related **many-to-many via an attachment**.
 
 **The Kubernetes framing**, which has repeatedly earned its keep:
 
-| Kubernetes | claudeosphere |
+| Kubernetes | osphere |
 |---|---|
 | Deployment / Service (+ ServiceAccount) | Sphere |
 | Pod | Agent |
