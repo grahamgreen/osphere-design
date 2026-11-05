@@ -21,6 +21,7 @@ it is not vaporware.
 | [**The rewrite**](docs/05-the-rewrite.md) | The script fabric's audit, replacement by a single tested binary, the fallback tier, and the cutover — including what broke anyway |
 | [**The operating fleet**](docs/06-the-operating-fleet.md) | Life after cutover: the unpaged outage and the paging layer it priced, provenance-across-a-hop, the knowledge/equipment/memory reset story, and the correction culture that turned out to be the real product |
 | [**The console era**](docs/07-the-console-era.md) | August–September 2026: the fabric wraps the seat, the record becomes the mechanism, what the chatter cost and the rulings that answered it, work as tasks with mail as the wake, the pager twice, and the 1.0 line — the move of every seat to the console, staged and not yet run |
+| [**The reset**](docs/08-the-reset.md) | September–November 2026: three idle weeks and a one-paragraph reset, heartbeats become fabric state, daemons that die instead of linger, the first migrated seat found silent for forty-two days and what that says about measuring liveness instead of work, intake as a standing order, and where the 1.0 line stands |
 
 ## The one-paragraph version
 
@@ -33,15 +34,15 @@ agent ≈ Pod — that is deliberate, and the metaphor has paid for itself repea
 
 ## Current state
 
-*As of 2026-09-24.* Running, not theoretical, and on its **second implementation** for two months. The original
+*As of 2026-11-05.* Running, not theoretical, and on its **second implementation** for three months. The original
 shell-script fabric was audited by its own agents (fifteen defects, twelve proven by execution), frozen as
 history, and replaced by a ground-up **single Go binary** that carries everything: messaging verbs, blob
-transfer, tasks, the liveness sidecar, the routing daemon, an IRC bridge, and the console that is becoming every
-agent's seat. One hundred tagged releases since cutover, v0.1.0 to v0.12.13. Three worker agents and a front
-door on three machines plus an off-site box coordinate over the Postgres-backed fabric: durable queues,
-competing-consumer delivery, an event stream as the source of truth with state tables as its projections,
-peer identity that can be succeeded without losing history, and an operator-ruled decision ledger of
-twenty-five entries.
+transfer, tasks, named job heartbeats, the liveness sidecar, the routing daemon, an IRC bridge, and the console
+that is becoming every agent's seat. One hundred and one tagged releases since cutover, v0.1.0 to v0.12.15.
+Three worker agents and a front door on three machines plus an off-site box coordinate over the Postgres-backed
+fabric: durable queues, competing-consumer delivery, an event stream as the source of truth with state tables as
+its projections, peer identity that can be succeeded without losing history, and an operator-ruled decision
+ledger of twenty-five entries.
 
 Two properties define the system, both operator-ruled: **no shell anywhere in the fabric stack** (every line of
 fabric logic ships in the tested binary), and its corollary — **the version string is the behavior contract**:
@@ -60,9 +61,17 @@ ordered tasks with the result a field on the row; mail is the wake path; units g
 requests reviewed by the front door under two lenses, *does it forward the ferret loop* and *what here can be
 taken away* ([The console era](docs/07-the-console-era.md)).
 
+The most recent lesson is the sharpest. The first seat to move onto the console had been running there for
+forty-two days — beating, reporting its version, draining its mail — and had failed every turn in the first
+second, because its launcher's environment could not find the model's CLI. Every instrument the fleet had
+measured *liveness*; none measured *work*. The same week shipped the verb that gives jobs a beat judged against
+an expectation, and the row that remains is to give a seat's turns that shape ([The reset](docs/08-the-reset.md)).
+
 **Where it is heading:** v1.0.0 is ruled as the release whose install moves a seat onto the console, so that a
-CLI update is a re-exec at a turn boundary instead of a restart mid-thought. The code is released; the first
-migration is staged and waiting on the operator's hand at a pane.
+CLI update is a re-exec at a turn boundary instead of a restart mid-thought. The code is released, the first seat
+is on the console and answering, and the two worker-seat migrations that complete the line are offered rows
+waiting on a claim. A second model provider as a backend, and a live switch between backends, are the rows
+ahead of them.
 
 **Not yet built:** model-assisted intake at the front door (the routing sphere itself runs, deterministic), the
 credential-broker sidecar, the semantic-memory tier, federation with external trust domains. Those are
